@@ -16,7 +16,7 @@ public class OsmJoin {
 	private boolean offset = true;
 	private double disOffset = 0.001;
 	
-	private TreeSet <Long> IDs = new TreeSet<Long>();
+	private TreeSet <Long> allIDs = new TreeSet<Long>();
 	
 	private double minlat = Double.MAX_VALUE;
 	private double maxlat = Double.MIN_VALUE;
@@ -193,8 +193,8 @@ public class OsmJoin {
 	public long getNewID() {
 		
 		for(long i = 1 ; i < 10000000; i++) {
-			if (IDs.contains(i) == false) {
-				IDs.add(i);
+			if (allIDs.contains(i) == false) {
+				allIDs.add(i);
 				return i;
 			}
 		}
@@ -212,7 +212,7 @@ public class OsmJoin {
 						String sa[] = line.split(" id=\"");
 						for (int i = 1; i < sa.length; i ++) {
 							long l = Long.parseLong(sa[i].split("\"")[0]);
-							IDs.add(l);
+							allIDs.add(l);
 						}						
 					}
 					line = bReader.readLine();
