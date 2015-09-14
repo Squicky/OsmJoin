@@ -38,6 +38,13 @@ public class OsmJoin {
 		writeNewOsm();
 	}
 	
+	/**
+	 * write new osm file:
+	 * 1. write 4 nodes for two new ways in north and south
+	 * 2. write all nodes
+	 * 3. write 2 way in north and south
+	 * 4. write all ways
+	 */
 	public void writeNewOsm() {
 		
 		long nodeId1 = 0;
@@ -52,6 +59,7 @@ public class OsmJoin {
 			bWriter.write("<?xml version='1.0' encoding='UTF-8'?>" + System.lineSeparator());
 			bWriter.write("<osm version=\"0.6\" generator=\"osmconvert 0.8\" timestamp=\"2015-08-07T20:00:00Z\">" + System.lineSeparator());
 			
+			// write 4 nodes for two new ways in north and south
 			if (offset) {
 				bWriter.write("<bounds minlat=\"" + (minlat - (2 * disOffset)) +  "\" minlon=\"" + (minlon - (2 * disOffset)) + "\" maxlat=\"" + (maxlat + (2 * disOffset)) + "\" maxlon=\"" + (maxlon + (2 * disOffset)) + "\"/>" + System.lineSeparator());
 				
@@ -76,6 +84,7 @@ public class OsmJoin {
 			
 			TreeSet <Long> nodeIDs = new TreeSet<Long>();
 			
+			// write all nodes
 			for(String path : osmInFiles) {
 				BufferedReader bReader = new BufferedReader( new InputStreamReader( new FileInputStream( new File( path ) ), "UTF-8" ));
 				String line = bReader.readLine();
@@ -123,24 +132,29 @@ public class OsmJoin {
 				bReader.close();
 			}
 			
+			// write 2 way in north and south
+			if (offset) {
+				long idway = this.getNewID();
+				bWriter.write("	<way id=\"" + idway + "\" >" + System.lineSeparator());
+				bWriter.write("		<nd ref=\"" + nodeId1 + "\"/>" + System.lineSeparator());
+				bWriter.write("		<nd ref=\"" + nodeId2 + "\"/>" + System.lineSeparator());
+				bWriter.write("		<tag k=\"highway\" v=\"unclassified\"/>" + System.lineSeparator());
+				bWriter.write("		<tag k=\"oneway\" v=\"yes\"/>" + System.lineSeparator());
+				bWriter.write("	</way>" + System.lineSeparator());
+				
+				idway = this.getNewID();
+				bWriter.write("	<way id=\"" + idway + "\" >" + System.lineSeparator());
+				bWriter.write("		<nd ref=\"" + nodeId3 + "\"/>" + System.lineSeparator());
+				bWriter.write("		<nd ref=\"" + nodeId4 + "\"/>" + System.lineSeparator());
+				bWriter.write("		<tag k=\"highway\" v=\"unclassified\"/>" + System.lineSeparator());
+				bWriter.write("		<tag k=\"oneway\" v=\"yes\"/>" + System.lineSeparator());
+				bWriter.write("	</way>" + System.lineSeparator());				
+			}
+			
+			
 			TreeSet <Long> wayIDs = new TreeSet<Long>();
 			
-			long idway = this.getNewID();
-			bWriter.write("	<way id=\"" + idway + "\" >" + System.lineSeparator());
-			bWriter.write("		<nd ref=\"" + nodeId1 + "\"/>" + System.lineSeparator());
-			bWriter.write("		<nd ref=\"" + nodeId2 + "\"/>" + System.lineSeparator());
-			bWriter.write("		<tag k=\"highway\" v=\"unclassified\"/>" + System.lineSeparator());
-			bWriter.write("		<tag k=\"oneway\" v=\"yes\"/>" + System.lineSeparator());
-			bWriter.write("	</way>" + System.lineSeparator());
-			
-			idway = this.getNewID();
-			bWriter.write("	<way id=\"" + idway + "\" >" + System.lineSeparator());
-			bWriter.write("		<nd ref=\"" + nodeId3 + "\"/>" + System.lineSeparator());
-			bWriter.write("		<nd ref=\"" + nodeId4 + "\"/>" + System.lineSeparator());
-			bWriter.write("		<tag k=\"highway\" v=\"unclassified\"/>" + System.lineSeparator());
-			bWriter.write("		<tag k=\"oneway\" v=\"yes\"/>" + System.lineSeparator());
-			bWriter.write("	</way>" + System.lineSeparator());
-			
+			// write all ways
 			for(String path : osmInFiles) {
 				BufferedReader bReader = new BufferedReader( new InputStreamReader( new FileInputStream( new File( path ) ), "UTF-8" ));
 				String line = bReader.readLine();
@@ -190,6 +204,10 @@ public class OsmJoin {
 		
 	}
 	
+	/**
+	 * 
+	 * @return create and return new unique id
+	 */
 	public long getNewID() {
 		
 		for(long i = 1 ; i < 10000000; i++) {
@@ -202,6 +220,9 @@ public class OsmJoin {
 		return -1;
 	}
 	
+	/**
+	 * search after "used" id in all osm files and save them in allIDs
+	 */
 	public void readIDs() {
 		for(String path : osmInFiles) {
 			try {
@@ -226,6 +247,9 @@ public class OsmJoin {
 		}
 	}
 	
+	/**
+	 * read the min and max GOS coordinates of all osm files
+	 */
 	public void readMinMaxBoundaries() {
 		for(String path : osmInFiles) {
 			try {
@@ -266,6 +290,11 @@ public class OsmJoin {
 		}
 	}
 	
+	/**
+	 * check input args of user
+	 * 
+	 * @param args
+	 */
 	public void checkArgs(String[] args) {
 		try {
 			for (int i = 0; i < args.length; i++) {
@@ -290,6 +319,9 @@ public class OsmJoin {
 		}
 	}
 	
+	/**
+	 * print description of args for user
+	 */
 	public void printParameterInfo() {
 		System.out.println("");
 		System.out.println("Parameter: ");
